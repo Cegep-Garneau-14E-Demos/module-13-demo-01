@@ -92,5 +92,58 @@ namespace person_wpf_demo_tests
 
             _navigationServiceMock.Verify(service => service.NavigateTo<NewAddressViewModel>(It.IsAny<object[]>()), Times.Never);
         }
+
+        [Test]
+        public void Address_count_returns_zero_when_selected_person_is_null()
+        {
+            _viewModel.SelectedPerson = null!;
+
+            int addressCount = _viewModel.AddressCount;
+
+            Assert.That(addressCount, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void Address_count_returns_zero_when_selected_person_addresses_is_null()
+        {
+            Person person = new Person { Id = 1, FirstName = "John", LastName = "Doe", Addresses = null! };
+            _viewModel.SelectedPerson = person;
+
+            int addressCount = _viewModel.AddressCount;
+
+            Assert.That(addressCount, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void Address_count_returns_correct_count_when_person_has_multiple_addresses()
+        {
+            Person person = new Person
+            {
+                Id = 1,
+                FirstName = "John",
+                LastName = "Doe",
+                Addresses = new List<Address>
+                {
+                    new Address { Street = "Street 1", City = "City 1", PostalCode = "A1A1A1" },
+                    new Address { Street = "Street 2", City = "City 2", PostalCode = "B2B2B2" },
+                    new Address { Street = "Street 3", City = "City 3", PostalCode = "C3C3C3" }
+                }
+            };
+            _viewModel.SelectedPerson = person;
+
+            int addressCount = _viewModel.AddressCount;
+
+            Assert.That(addressCount, Is.EqualTo(3));
+        }
+
+        [Test]
+        public void Navigate_to_new_address_command_cannot_execute_when_selected_person_is_null()
+        {
+            _viewModel.SelectedPerson = null!;
+
+            bool canExecute = _viewModel.NavigateToNewAddressViewCommand.CanExecute(null);
+
+            Assert.That(canExecute, Is.False);
+        }
     }
 }

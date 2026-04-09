@@ -56,5 +56,75 @@ namespace person_wpf_demo_tests
 
             Assert.That(canExecute, Is.False);
         }
+
+        [Test]
+        public void Apply_navigation_parameters_with_null_does_not_throw_exception()
+        {
+            Assert.DoesNotThrow(() => _viewModel.ApplyNavigationParameters(null));
+        }
+
+        [Test]
+        public void Apply_navigation_parameters_with_empty_array_does_not_throw_exception()
+        {
+            Assert.DoesNotThrow(() => _viewModel.ApplyNavigationParameters());
+        }
+
+        [Test]
+        public void Apply_navigation_parameters_with_wrong_type_does_not_crash()
+        {
+            Assert.DoesNotThrow(() => _viewModel.ApplyNavigationParameters("wrong type"));
+        }
+
+        [Test]
+        public void Save_command_cannot_execute_when_city_is_empty()
+        {
+            Person person = new Person { Id = 42 };
+            _viewModel.ApplyNavigationParameters(person);
+            _viewModel.Street = "Candy Lane";
+            _viewModel.City = string.Empty;
+            _viewModel.PostalCode = "H0H0H0";
+
+            bool canExecute = _viewModel.SaveCommand.CanExecute(null);
+
+            Assert.That(canExecute, Is.False);
+        }
+
+        [Test]
+        public void Save_command_cannot_execute_when_postal_code_is_empty()
+        {
+            Person person = new Person { Id = 42 };
+            _viewModel.ApplyNavigationParameters(person);
+            _viewModel.Street = "Candy Lane";
+            _viewModel.City = "North Pole";
+            _viewModel.PostalCode = string.Empty;
+
+            bool canExecute = _viewModel.SaveCommand.CanExecute(null);
+
+            Assert.That(canExecute, Is.False);
+        }
+
+        [Test]
+        public void Setting_street_to_empty_adds_validation_error()
+        {
+            _viewModel.Street = "";
+
+            Assert.That(_viewModel.HasErrors, Is.True);
+        }
+
+        [Test]
+        public void Setting_city_to_empty_adds_validation_error()
+        {
+            _viewModel.City = "";
+
+            Assert.That(_viewModel.HasErrors, Is.True);
+        }
+
+        [Test]
+        public void Setting_postal_code_to_empty_adds_validation_error()
+        {
+            _viewModel.PostalCode = "";
+
+            Assert.That(_viewModel.HasErrors, Is.True);
+        }
     }
 }

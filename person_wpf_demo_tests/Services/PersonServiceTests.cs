@@ -86,6 +86,79 @@ namespace person_wpf_demo_tests
 
             _personDAL_Mock.Verify(repo => repo.Delete(person), Times.Once);
         }
+
+        [Test]
+        public void Adding_a_person_with_exactly_two_character_first_name_calls_save()
+        {
+            Person person = new Person { FirstName = "Jo", LastName = "Doe", BirthDate = new DateTime(1990, 1, 1) };
+
+            _personService.Add(person);
+
+            _personDAL_Mock.Verify(repo => repo.Save(person), Times.Once);
+        }
+
+        [Test]
+        public void Adding_a_person_with_exactly_two_character_last_name_calls_save()
+        {
+            Person person = new Person { FirstName = "John", LastName = "Do", BirthDate = new DateTime(1990, 1, 1) };
+
+            _personService.Add(person);
+
+            _personDAL_Mock.Verify(repo => repo.Save(person), Times.Once);
+        }
+
+        [Test]
+        public void Adding_a_person_with_numbers_in_first_name_throws_exception()
+        {
+            Person person = new Person { FirstName = "John123", LastName = "Doe", BirthDate = new DateTime(1990, 1, 1) };
+
+            Assert.That(() => _personService.Add(person), Throws.ArgumentException);
+        }
+
+        [Test]
+        public void Adding_a_person_with_numbers_in_last_name_throws_exception()
+        {
+            Person person = new Person { FirstName = "John", LastName = "Doe123", BirthDate = new DateTime(1990, 1, 1) };
+
+            Assert.That(() => _personService.Add(person), Throws.ArgumentException);
+        }
+
+        [Test]
+        public void Adding_a_person_with_spaces_in_first_name_throws_exception()
+        {
+            Person person = new Person { FirstName = "Jean Paul", LastName = "Doe", BirthDate = new DateTime(1990, 1, 1) };
+
+            Assert.That(() => _personService.Add(person), Throws.ArgumentException);
+        }
+
+        [Test]
+        public void Adding_a_person_with_spaces_in_last_name_throws_exception()
+        {
+            Person person = new Person { FirstName = "John", LastName = "Von Doe", BirthDate = new DateTime(1990, 1, 1) };
+
+            Assert.That(() => _personService.Add(person), Throws.ArgumentException);
+        }
+
+        [Test]
+        public void Calculating_age_for_person_born_today_returns_zero()
+        {
+            DateTime birthDate = DateTime.Today;
+
+            int age = _personService.CalculateAge(birthDate);
+
+            Assert.That(age, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void Calculating_age_for_person_with_birthday_not_yet_this_year_returns_correct_age()
+        {
+            DateTime birthDate = DateTime.Today.AddYears(-30).AddDays(1);
+            int expectedAge = 29;
+
+            int age = _personService.CalculateAge(birthDate);
+
+            Assert.That(age, Is.EqualTo(expectedAge));
+        }
     }
 }
 
